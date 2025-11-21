@@ -1,6 +1,10 @@
 
 class InsumoModel:
+<<<<<<< HEAD
     def __init__(self, id: int, nombre_usuario: str, clave: str, apellido: str,fecha_nacimiento: str, telefono: int, email: str , tipo: str, conexion: X ):
+=======
+    def __init__(self, id: int, nombre_usuario: str, clave: int ,apellido: str ,fecha_nacimiento: str,telefono: int,email: str,tipo: str):
+>>>>>>> 11ad2a1d406bc3cb49c011abc26c751b57d6f80f
         self.id = id
         self.nombre_usuario = nombre_usuario
         self.clave = clave
@@ -9,7 +13,12 @@ class InsumoModel:
         self.telefono = telefono
         self.email = email
         self.tipo = tipo
+<<<<<<< HEAD
         self.conexion = conexion
+=======
+
+    def Crear_insumo(self,id, nombre_usuario, clave, apellido, fecha_nacimiento, telefono, email, tipo) -> bool:
+>>>>>>> 11ad2a1d406bc3cb49c011abc26c751b57d6f80f
     
     def Guardar_item(self, id, nombre_usuario, clave, apellido, fecha_nacimiento, telefono, email, tipo) -> bool:
 
