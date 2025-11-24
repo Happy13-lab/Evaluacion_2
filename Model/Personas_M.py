@@ -28,7 +28,7 @@ class UsuarioModel:
             else: 
                 Insertar = "insert into usuarios (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo) values (:1, :2, :3, :4, :5, :6, :7, :8, :9)"
                 cursor.execute(Insertar, (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Usuario con {id} creado correctamente.")
 
                 return True
@@ -39,6 +39,85 @@ class UsuarioModel:
         finally:
             if cursor:
                 cursor.close()
+    
+    def Editar_usuario(self, id: int, *dato: tuple) -> bool:
+
+        cursor  = self.conexion.obtener_cursor()
+
+        try:
+            validacion = "select * from usuarios where id = :1 "
+            cursor.execute(validacion,(id,))
+
+            if len(cursor.fetchall()) == 0:
+                print(f"El archivo que esta intentado editar no existe")
+            
+            else:
+                
+                Editar = "update usuarios set nombre_usuario = :1, clave = :2, nombre = :3, apellido = :4, fecha_nacimiento = :5, telefono = :6, email = :7, tipo = :8 where id = :9"
+                cursor.execute(Editar,(id,dato[0],dato[1],dato[2],dato[3],dato[4],dato[5],dato[6],dato[7],id))
+                self.conexion.connection.commit()
+                print(f"[####] El usuario a actualizado sus datos con exito")
+
+                return True
+        
+        except Exception as e:
+            print("[####] No se puede guardar el usuario")
+
+            return False
+        
+        finally:
+            if cursor:
+                cursor.close()
+    
+    def Eliminar_usuario(self, id: int) -> bool:
+
+            cursor = self.conexion.obtener_cursor()
+
+            try:
+                validacion = "select * from usuarios where id = :1"
+                cursor.execute(validacion, (id,))
+            
+                if len(cursor.fetchall()) == 0:
+                    print(f"[####] Se a eliminado corrrectamente el usuario")
+                    return False
+                
+                else:
+                    eliminar =  "delete from usuarios where id = :1"
+                    cursor.execute(eliminar,(id,))
+                    self.conexion.connection.commit()
+                    print(f"[####] Se a eliminado el usuario correctamente")
+
+                    return True
+            except Exception as e:
+                print(f"[####] Error al eliminar al usuario -> {e}")
+            
+            finally:
+                if cursor:
+                    cursor.close()
+    def Mostrar_usuarios(self) -> list:
+
+        cursor = self.conexion.obtener_cursor()
+
+        try:
+            Mostrar = "select id,nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo from usuarios"
+            cursor.execute(Mostrar)
+            dato = cursor.fetchall()
+
+            if len(dato) == 0:
+                print(f"[####] no hay usuarios registrados")
+
+                return []
+            else:
+                print("[####] Usuarios mostrados correctamente")
+                return dato
+        
+        except Exception as e:
+            print(f"[####] Error al mostrar el usuario -> {e}")
+        
+        finally:
+            if cursor:
+                cursor.close()
+
 
 class PacienteModel(UsuarioModel):
     def __init__(self, id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: str, telefono: int, email: str, tipo: str, comuna: str, fecha_primera_visita: str, conexion: ConexionOracle):
@@ -73,7 +152,7 @@ class PacienteModel(UsuarioModel):
             else: 
                 Insertar = "insert into pacientes (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, comuna, fecha_primera_visita) values (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11)"
                 cursor.execute(Insertar, (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, comuna, fecha_primera_visita))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Paciente con {id} creado correctamente.")
 
                 return True
@@ -101,7 +180,7 @@ class PacienteModel(UsuarioModel):
             else: 
                 Editar = "update pacientes set nombre_usuario = :1, clave = :2, nombre = :3, apellido = :4, fecha_nacimiento = :5, telefono = :6, email = :7, tipo = :8, comuna = :9, fecha_primera_visita = :10 where id = :11"
                 cursor.execute(Editar, (nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, comuna, fecha_primera_visita, id))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Paciente con {id} editado correctamente.")
 
                 return True
@@ -129,7 +208,7 @@ class PacienteModel(UsuarioModel):
             else: 
                 Eliminar = "delete from pacientes where id = :1"
                 cursor.execute(Eliminar, (id,))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Paciente con {id} eliminado correctamente.")
 
                 return True
@@ -203,7 +282,7 @@ class MedicoModel(UsuarioModel):
             else: 
                 Insertar = "insert into medicos (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso) values (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12)"
                 cursor.execute(Insertar, (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Médico con {id} creado correctamente.")
 
                 return True
@@ -231,7 +310,7 @@ class MedicoModel(UsuarioModel):
             else: 
                 Editar = "update medicos set nombre_usuario = :1, clave = :2, nombre = :3, apellido = :4, fecha_nacimiento = :5, telefono = :6, email = :7, tipo = :8, especialidad = :9, id_medico = :10, horario_ingreso = :11 where id = :12"
                 cursor.execute(Editar, (nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso, id))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Médico con {id} editado correctamente.")
 
                 return True
@@ -258,7 +337,7 @@ class MedicoModel(UsuarioModel):
             else: 
                 Eliminar = "delete from medicos where id = :1"
                 cursor.execute(Eliminar, (id,))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Médico con {id} eliminado correctamente.")
 
                 return True

@@ -1,5 +1,6 @@
 import re
 from Model.Objetos_M import InsumoModel, RecetasModel, ConsultasModel, AgendaModel
+from datetime import date
 
 SUS_KEYS = [
     r";", r"--", r"/\*", r"\bOR\b", r"\bAND\b", r"\bUNION\b",
@@ -21,45 +22,44 @@ class InsumoController:
 
             return False
         else:
-            return self.model.registrar_insumo(id, nombre, tipo, stock)
-
+            return self.model.Crear_insumo(id,nombre,tipo,stock)
 class RecetasController:
     def __init__(self, Model:RecetasModel):
         self.model = Model
 
     def Registro_Recetas(self,id: int, id_paciente: int,id_medico: int, descripcion: str):
 
-        if patron.search(nombre) or patron.search(tipo):
+        if patron.search(descripcion):
             print("[####]: No se puede ingresar codigo SQL en los strings")
 
             return False
         else:
-            return self.model.registrar_Recetas(id, id_paciente, id_medico, descripcion)
+            return self.model.insertar_receta(id, id_paciente, id_medico, descripcion)
 
 class ConsultasController:
     def __init__(self, Model:ConsultasModel):
         self.model = Model
 
-    def Registro_Recetas(self,id: int, id_paciente: int,id_medico: int, id_recetas: int, fecha: str, comentarios: str):
+    def Registro_Consultas(self,id: int, id_paciente: int,id_medico: int, id_recetas: int, fecha: date, comentarios: str):
 
-        if patron.search(nombre) or patron.search(tipo):
+        if patron.search(fecha) or patron.search(comentarios):
             print("[####]: No se puede ingresar codigo SQL en los strings")
 
             return False
         else:
-            return self.model.registrar_Recetas(id, id_paciente, id_medico, id_recetas, fecha, comentarios)
+            return self.model.insertar_consulta(id, id_paciente, id_medico, id_recetas, fecha, comentarios)
 
 class AgendaController:
-    def __init__(self, Model:ConsultasModel):
+    def __init__(self, Model:AgendaModel):
         self.model = Model
 
-    def Registro_Recetas(self,id: int, id_paciente: int,id_medico: int, fecha_consulta: str, tipo: str):
+    def Registro_Agenda(self,id: int, id_paciente: int,id_medico: int, fecha_consulta: date, tipo: str):
 
-        if patron.search(nombre) or patron.search(tipo):
+        if patron.search(fecha_consulta) or patron.search(tipo):
             print("[####]: No se puede ingresar codigo SQL en los strings")
 
             return False
         else:
-            return self.model.registrar_Rec(id, id_paciente, id_medico, id_recetas, fecha, comentarios)
+            return self.model.insertar_agenda(id, id_paciente, id_medico, fecha_consulta, tipo)
 
 

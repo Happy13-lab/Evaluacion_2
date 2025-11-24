@@ -1,17 +1,15 @@
 from confing.db_config import ConexionOracle
+from datetime import date
+
 class InsumoModel:
-    def __init__(self, id: int, nombre_usuario: str, clave: str, apellido: str,fecha_nacimiento: str, telefono: int, email: str , tipo: str, conexion: ConexionOracle ):
+    def __init__(self, id: int,nombre: str, tipo: str, stock: int, conexion: ConexionOracle ):
         self.id = id
-        self.nombre_usuario = nombre_usuario
-        self.clave = clave
-        self.apellido = apellido
-        self.fecha_nacimiento = fecha_nacimiento
-        self.telefono = telefono
-        self.email = email
+        self.nombre = nombre
         self.tipo = tipo
+        self.stock = stock
         self.conexion = conexion
     
-    def Guardar_item(self, id, nombre_usuario, clave, apellido, fecha_nacimiento, telefono, email, tipo) -> bool:
+    def Crear_insumo(self, id, nombre, tipo, stock) -> bool:
 
         cursor = self.conexion.obterner_cursor()
 
@@ -25,9 +23,9 @@ class InsumoModel:
                 return  False
             
             else:
-                Insertar = "insert into insumo (id, nombre_usuario, clave, apellido, fecha_nacimiento, telefono, email, tipo) values (:1, :2, :3, :4, :5, :6, :7, :8)"
-                cursor.execute(Insertar, (id, nombre_usuario, clave, apellido, fecha_nacimiento, telefono, email, tipo))
-                self.conexion.commit()
+                Insertar = "insert into insumo (id,nombre, tipo, stock) values (:1, :2, :3, :4)"
+                cursor.execute(Insertar, (id, nombre, tipo, stock))
+                self.conexion.connection.commit()
                 print(f"[####]: Item {id} guardado correctamente")
                 return True
         
@@ -49,9 +47,9 @@ class InsumoModel:
 
             if len(cursor.fetchall()) == 0:
                 if datos:
-                    Editar = "update insumo set id = :1, nombre_usuario = :2, clave = :3, apellido = :4, fecha_nacimiento = :5, telefono = :6, email = :7, tipo = :8 where id = :9"
-                    cursor.execute(Editar, (id, datos[0], datos[1], datos[2], datos[3], datos[4], datos[5], datos[6], datos[7], id))
-                    self.conexion.commit()
+                    Editar = "update insumo set id = :1, nombre = :2, tipo = :3, stock = :4 where id = :5"
+                    cursor.execute(Editar, (id, datos[0], datos[1], datos[2], id))
+                    self.conexion.connection.commit()
                     print(f"[####]: Item {id} editado correctamente")
             else:
                 print(f"[####]: No existe un item con el id {id}")
@@ -94,7 +92,7 @@ class InsumoModel:
         cursor = self.conexion.obterner_cursor()
 
         try:
-            Mostrar = "select id, nombre_usuario, clave, apellido, fecha_nacimiento, telefono, email, tipo from insumo"
+            Mostrar = "select id,nombre,tipo,stock from insumo"
             cursor.execute(Mostrar)
             datos = cursor.fetchall()
 
@@ -116,16 +114,17 @@ class InsumoModel:
 class RecetasModel:
 
 
-    def __init__(self, id: int, id_paciente: int, id_medico: int, id_receta: int, descripcion: str, conexion: ConexionOracle):
+    def __init__(self, id: int, id_paciente: int, id_medico: int, descripcion: str, conexion: ConexionOracle):
         self.id = id
         self.id_paciente = id_paciente
         self.id_medico = id_medico 
-        self.id_receta = id_receta
         self.descripcion = descripcion
         self.conexion = conexion
         
-    def insertar_receta(self, id: int, id_paciente: int, id_medico: int, id_receta: int, descripcion: str) -> bool:
-        cursor = self.conexion.obterner_cursor()
+    def insertar_receta(self, id, id_paciente, id_medico, descripcion) -> bool:
+       
+        cursor = self.conexion.obtener_cursor()
+
 
         try:
             consulta_validacion = "select * from recetas where id = :1"
@@ -137,9 +136,9 @@ class RecetasModel:
                 return  False
             
             else:
-                Insertar = "insert into recetas (id, id_paciente, id_medico, id_receta, descripcion) values (:1, :2, :3, :4, :5)"
-                cursor.execute(Insertar, (id, id_paciente, id_medico, id_receta, descripcion))
-                self.conexion.commit()
+                Insertar = "insert into recetas (id, id_paciente, id_medico, descripcion) values (:1, :2, :3, :4)"
+                cursor.execute(Insertar, (id, id_paciente, id_medico, descripcion))
+                self.conexion.connection.commit()
                 print(f"[####]: Receta {id} guardada correctamente")
                 return True
         
@@ -153,7 +152,7 @@ class RecetasModel:
 
     def editar_receta(self, id: int, *datos:tuple) -> bool:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             consulta_validacion = "select * from recetas where id = :1"
@@ -161,9 +160,9 @@ class RecetasModel:
 
             if len(cursor.fetchall()) == 0:
                 if datos:
-                    Editar = "update recetas set id = :1, id_paciente = :2, id_medico = :3, id_receta = :4, descripcion = :5 where id = :6"
+                    Editar = "update recetas set id = :1, id_paciente = :2, id_medico = :3 descripcion = :4 where id = :5"
                     cursor.execute(Editar, (id, datos[0], datos[1], datos[2], datos[3], id))
-                    self.conexion.commit()
+                    self.conexion.connection.commit()
                     print(f"[####]: Receta {id} editada correctamente")
             else:
                 print(f"[####]: No existe una receta con el id {id}")
@@ -179,7 +178,7 @@ class RecetasModel:
     
     def eliminar_receta(self, id: int) -> bool:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             consulta_validacion = "select * from recetas where id = :1"
@@ -188,7 +187,7 @@ class RecetasModel:
             if len(cursor.fetchall()) >0:
                 Eliminar = "delete from recetas where id = :1"
                 cursor.execute(Eliminar, (id,))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Receta {id} eliminada correctamente")
                 return True
             else:
@@ -203,10 +202,10 @@ class RecetasModel:
 
     def Mostrar_recetas(self) -> list:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
-            Mostrar = "select id, id_paciente, id_medico, id_receta, descripcion from recetas"
+            Mostrar = "select id, id_paciente, id_medico, descripcion from recetas"
             cursor.execute(Mostrar)
             datos = cursor.fetchall()
 
@@ -226,7 +225,7 @@ class RecetasModel:
 
 class ConsultasModel:
 
-    def __init__(self, id: int, id_paciente: int, id_medico: int, id_receta: int, fecha: str, comentarios:str, conexion: ConexionOracle):
+    def __init__(self, id: int, id_paciente: int, id_medico: int, id_receta: int, fecha: date, comentarios:str, conexion: ConexionOracle):
         self.id = id
         self.id_paciente = id_paciente
         self.id_medico = id_medico
@@ -237,7 +236,7 @@ class ConsultasModel:
         
     def insertar_consulta(self, id, id_paciente, id_medico, id_receta, fecha, comentarios) -> bool: 
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             consulta_validacion = "select * from consultas where id = :1"
@@ -251,7 +250,7 @@ class ConsultasModel:
             else:
                 Insertar = "insert into consultas (id, id_paciente, id_medico, id_receta, fecha, comentarios) values (:1, :2, :3, :4, :5, :6)"
                 cursor.execute(Insertar, (id, id_paciente, id_medico, id_receta, fecha, comentarios))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Consulta {id} guardada correctamente")
                 return True
         
@@ -265,7 +264,7 @@ class ConsultasModel:
     
     def editar_consultas(self, id: int, *datos: tuple) -> bool:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             validacion_consulta = "select * from consultas where id = :1"
@@ -275,7 +274,7 @@ class ConsultasModel:
                 if datos:
                     Editar = "update consultas set id = :1, id_paciente = :2, id_medico = :3, id_receta = :4, fecha = :5, comentarios = :6 where id = :7"
                     cursor.execute(Editar, (id, datos[0], datos[1], datos[2], datos[3], datos[4], id))
-                    self.conexion.commit()
+                    self.conexion.connection.commit()
                     print(f"[####]: Consulta {id} editada correctamente") 
 
                     return True 
@@ -297,7 +296,7 @@ class ConsultasModel:
     
     def eliminar_consulta(self, id: int) -> bool:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             consulta_validacion = "select * from consultas where id = :1"
@@ -306,7 +305,7 @@ class ConsultasModel:
             if len(cursor.fetchall()) >0:
                 Eliminar = "delete from consultas where id = :1"
                 cursor.execute(Eliminar, (id,))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Consulta {id} eliminada correctamente")
                 return True
             else:
@@ -321,7 +320,7 @@ class ConsultasModel:
     
     def mostrar_consultas(self) -> list:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             Mostrar = "select id, id_paciente, id_medico, id_receta, fecha, comentarios from consultas"
@@ -344,7 +343,7 @@ class ConsultasModel:
     
 class AgendaModel:
     
-        def __init__(self, id: int, id_paciente: int, id_medico: int, fecha_consulta: str, estado: str, conexion: ConexionOracle):
+        def __init__(self, id: int, id_paciente: int, id_medico: int, fecha_consulta: date, estado: str, conexion: ConexionOracle):
             self.id = id
             self.id_paciente = id_paciente
             self.id_medico = id_medico
@@ -354,7 +353,7 @@ class AgendaModel:
         
         def insertar_agenda(self,id,id_paciente,id_medico,fecha_consulta,estado) -> bool:
 
-            cursor = self.conexion.obterner_cursor()
+            cursor = self.conexion.obtener_cursor()
 
             try:
                 consulta_validacion = "select * from agenda where id = :1"
@@ -368,7 +367,7 @@ class AgendaModel:
                 else:
                     Insertar = "insert into agenda (id, id_paciente, id_medico, fecha_consulta, estado) values (:1, :2, :3, :4, :5)"
                     cursor.execute(Insertar, (id, id_paciente, id_medico, fecha_consulta, estado))
-                    self.conexion.commit()
+                    self.conexion.connection.commit()
                     print(f"[####]: Agenda {id} guardada correctamente")
                     return True
             
@@ -382,7 +381,7 @@ class AgendaModel:
         
         def editar_agenda(self, id: int, *datos: tuple) -> bool:
 
-            cursor = self.conexion.obterner_cursor()
+            cursor = self.conexion.obtener_cursor()
 
             try:
                 consulta_validacion = "select * from agenda where id = :1"
@@ -392,7 +391,7 @@ class AgendaModel:
                     if datos:
                         Editar = "update agenda set id = :1, id_paciente = :2, id_medico = :3, fecha_consulta = :4, estado = :5 where id = :6"
                         cursor.execute(Editar, (id, datos[0], datos[1], datos[2], datos[3], id))
-                        self.conexion.commit()
+                        self.conexion.connection.commit()
                         print(f"[####]: Agenda {id} editada correctamente")
                 else:
                     print(f"[####]: No existe una agenda con el id {id}")
@@ -408,7 +407,7 @@ class AgendaModel:
         
         def eliminar_agenda(self, id: int) -> bool:
 
-            cursor = self.conexion.obterner_cursor()
+            cursor = self.conexion.obtener_cursor()
 
             try:
                 consulta_validacion = "select * from agenda where id = :1"
@@ -417,7 +416,7 @@ class AgendaModel:
                 if len(cursor.fetchall()) >0:
                     Eliminar = "delete from agenda where id = :1"
                     cursor.execute(Eliminar, (id,))
-                    self.conexion.commit()
+                    self.conexion.connection.commit()
                     print(f"[####]: Agenda {id} eliminada correctamente")
                     return True
                 else:
@@ -432,7 +431,7 @@ class AgendaModel:
         
         def mostrar_agendas(self) -> list:
 
-            cursor = self.conexion.obterner_cursor()
+            cursor = self.conexion.obtener_cursor()
 
             try:
                 Mostrar = "select id, id_paciente, id_medico, fecha_consulta, estado from agenda"
