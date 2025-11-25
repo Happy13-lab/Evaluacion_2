@@ -1,5 +1,5 @@
 import re
-from datetime import date
+from datetime import date,time
 from Model.Personas_M import UsuarioModel,PacienteModel,MedicoModel
 
 SUS_KEYS = [
@@ -42,4 +42,53 @@ class PacienteController:
     def __init__(self, Modelo: PacienteModel):
         self.Modelo = Modelo
 
+    def registrar_paciente(self, comuna: str, fecha_primera_visita: date):
+
+        if not comuna or not fecha_primera_visita:
+            print("[####]: Hace faltan datos en el registro de paciente")
+            return False
+        
+        if patron.search(comuna)or patron.search(fecha_primera_visita):
+            print("[####]: No se puede ingresar codigo SQL en los strings")
+            return False
+        
+        return self.Modelo.Crear_paciente(comuna, fecha_primera_visita)
+    
+    def listar_paciente(self) -> list:
+        
+        paciente = self.Modelo.Mostrar_pacientes()
+
+        if len(paciente) > 0:
+            return [ { "id": p[0], "comuna": p[1], "fecha_primera_visita": p[2] } for p in paciente ]
+
+        else:
+            return []
+
+class MedicoController:
+
+    def __init__(self, Modelo: MedicoModel):
+        self.Modelo = Modelo
+
+    def registrar_medico(self, especialidad: str, horario_atencion: time, fecha_ingreso:date):
+        
+        if not especialidad or not horario_atencion or not fecha_ingreso:
+
+            print("[####]: Hace faltan datos en el registro de medico")
+            return False
+        
+        if patron.search(especialidad) or patron.search(horario_atencion) or patron.search(fecha_ingreso):
+            print("[####]: No se puede ingresar codigo SQL en los strings")
+            return False
+        
+        return self.Modelo.Crear_medico(especialidad, horario_atencion, fecha_ingreso)
+    
+    def listar_medico(self) -> list:
+        
+        medico = self.Modelo.Mostrar_medicos()
+
+        if len(medico) > 0:
+            return [ { "id": m[0], "especialidad": m[1], "horario_atencion": m[2], "fecha_ingreso": m[3] } for m in medico ]
+
+        else:
+            return []
 
