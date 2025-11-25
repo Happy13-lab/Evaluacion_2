@@ -14,7 +14,7 @@ class InsumoModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            consulta_validacion = "select * from insumo where id = :1"
+            consulta_validacion = "select * from ms_insumos where id = :1"
             cursor.execute(consulta_validacion, (id,))
 
             if len(cursor.fetchall()) >0:
@@ -23,7 +23,7 @@ class InsumoModel:
                 return  False
             
             else:
-                Insertar = "insert into insumo (id,nombre, tipo, stock) values (:1, :2, :3, :4)"
+                Insertar = "insert into ms_insumos (id,nombre, tipo, stock) values (:1, :2, :3, :4)"
                 cursor.execute(Insertar, (id, nombre, tipo, stock))
                 self.conexion.connection.commit()
                 print(f"[####]: Item {id} guardado correctamente")
@@ -42,15 +42,16 @@ class InsumoModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            consulta_validacion = "select * from insumo where id = :1"
+            consulta_validacion = "select * from ms_insumos where id = :1"
             cursor.execute(consulta_validacion, (id,))
 
-            if len(cursor.fetchall()) == 0:
+            if len(cursor.fetchall()) > 0:
                 if datos:
-                    Editar = "update insumo set id = :1, nombre = :2, tipo = :3, stock = :4 where id = :5"
-                    cursor.execute(Editar, (id, datos[0], datos[1], datos[2], id))
+                    Editar = "update ms_insumos set nombre = :1, tipo = :2, stock = :3 where id = :4"
+                    cursor.execute(Editar, (datos[0], datos[1], datos[2], id,))
                     self.conexion.connection.commit()
                     print(f"[####]: Item {id} editado correctamente")
+                    return True
             else:
                 print(f"[####]: No existe un item con el id {id}")
                 return False
@@ -68,13 +69,13 @@ class InsumoModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            consulta_validacion = "select * from insumo where id = :1"
+            consulta_validacion = "select * from ms_insumos where id = :1"
             cursor.execute(consulta_validacion, (id,))
                            
             if len(cursor.fetchall()) >0:
-                Eliminar = "delete from insumo where id = :1"
+                Eliminar = "delete from ms_insumos where id = :1"
                 cursor.execute(Eliminar, (id,))
-                self.conexion.commit()
+                self.conexion.connection.commit()
                 print(f"[####]: Item {id} eliminado correctamente")
                 return True
             else:
@@ -82,6 +83,7 @@ class InsumoModel:
                 return False
         except Exception as e:
             print(f"[####]: Error al eliminar el item {id} -> {e}")
+            return False
         
         finally:
             if cursor: 
@@ -92,7 +94,7 @@ class InsumoModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            Mostrar = "select id,nombre,tipo,stock from insumo"
+            Mostrar = "select id,nombre,tipo,stock from ms_insumos"
             cursor.execute(Mostrar)
             datos = cursor.fetchall()
 
@@ -127,7 +129,7 @@ class RecetasModel:
 
 
         try:
-            consulta_validacion = "select * from recetas where id = :1"
+            consulta_validacion = "select * from ms_recetas where id = :1"
             cursor.execute(consulta_validacion, (id,))
 
             if len(cursor.fetchall()) >0:
@@ -136,7 +138,7 @@ class RecetasModel:
                 return  False
             
             else:
-                Insertar = "insert into recetas (id, id_paciente, id_medico, descripcion) values (:1, :2, :3, :4)"
+                Insertar = "insert into ms_recetas (id, id_paciente, id_medico, descripcion) values (:1, :2, :3, :4)"
                 cursor.execute(Insertar, (id, id_paciente, id_medico, descripcion))
                 self.conexion.connection.commit()
                 print(f"[####]: Receta {id} guardada correctamente")
@@ -155,15 +157,16 @@ class RecetasModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            consulta_validacion = "select * from recetas where id = :1"
+            consulta_validacion = "select * from ms_recetas where id = :1"
             cursor.execute(consulta_validacion, (id,))
 
-            if len(cursor.fetchall()) == 0:
+            if len(cursor.fetchall()) > 0:
                 if datos:
-                    Editar = "update recetas set id = :1, id_paciente = :2, id_medico = :3 descripcion = :4 where id = :5"
-                    cursor.execute(Editar, (id, datos[0], datos[1], datos[2], datos[3], id))
+                    Editar = "update ms_recetas set  descripcion = :1 where id = :2"
+                    cursor.execute(Editar, (datos[0], id,))
                     self.conexion.connection.commit()
                     print(f"[####]: Receta {id} editada correctamente")
+                    return True
             else:
                 print(f"[####]: No existe una receta con el id {id}")
                 return False
@@ -181,11 +184,11 @@ class RecetasModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            consulta_validacion = "select * from recetas where id = :1"
+            consulta_validacion = "select * from ms_recetas where id = :1"
             cursor.execute(consulta_validacion, (id,))
                            
             if len(cursor.fetchall()) >0:
-                Eliminar = "delete from recetas where id = :1"
+                Eliminar = "delete from ms_recetas where id = :1"
                 cursor.execute(Eliminar, (id,))
                 self.conexion.connection.commit()
                 print(f"[####]: Receta {id} eliminada correctamente")
@@ -195,6 +198,7 @@ class RecetasModel:
                 return False
         except Exception as e:
             print(f"[####]: Error al eliminar la receta {id} -> {e}")
+            return False
         
         finally:
             if cursor: 
@@ -205,7 +209,7 @@ class RecetasModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            Mostrar = "select id, id_paciente, id_medico, descripcion from recetas"
+            Mostrar = "select id, id_paciente, id_medico, descripcion from ms_recetas"
             cursor.execute(Mostrar)
             datos = cursor.fetchall()
 
@@ -239,16 +243,15 @@ class ConsultasModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            consulta_validacion = "select * from consultas where id = :1"
+            consulta_validacion = "select * from ms_consultas where id = :1"
             cursor.execute(consulta_validacion, (id,))
 
             if len(cursor.fetchall()) >0:
                 print(f"[####]: Ya existe una consulta con el id {id}")
-
                 return  False
             
             else:
-                Insertar = "insert into consultas (id, id_paciente, id_medico, id_receta, fecha, comentarios) values (:1, :2, :3, :4, :5, :6)"
+                Insertar = "insert into ms_consultas (id, id_paciente, id_medico, id_receta, fecha, comentarios) values (:1, :2, :3, :4, :5, :6)"
                 cursor.execute(Insertar, (id, id_paciente, id_medico, id_receta, fecha, comentarios))
                 self.conexion.connection.commit()
                 print(f"[####]: Consulta {id} guardada correctamente")
@@ -267,19 +270,17 @@ class ConsultasModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            validacion_consulta = "select * from consultas where id = :1"
+            validacion_consulta = "select * from ms_consultas where id = :1"
             cursor.execute(validacion_consulta, (id,))
 
-            if len(cursor.fetchall()) == 0:
+            if len(cursor.fetchall()) > 0:
                 if datos:
-                    Editar = "update consultas set id = :1, id_paciente = :2, id_medico = :3, id_receta = :4, fecha = :5, comentarios = :6 where id = :7"
-                    cursor.execute(Editar, (id, datos[0], datos[1], datos[2], datos[3], datos[4], id))
+                    Editar = "update ms_consultas set fecha = :1, comentarios = :2 where id = :3"
+                    cursor.execute(Editar, ( datos[0], datos[1], id,))
                     self.conexion.connection.commit()
                     print(f"[####]: Consulta {id} editada correctamente") 
 
                     return True 
-
-                
                 else:
                     print(f"[####]: sin datos ingresados en {id}")
                     return False
@@ -299,11 +300,11 @@ class ConsultasModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            consulta_validacion = "select * from consultas where id = :1"
+            consulta_validacion = "select * from ms_consultas where id = :1"
             cursor.execute(consulta_validacion, (id,))
                            
             if len(cursor.fetchall()) >0:
-                Eliminar = "delete from consultas where id = :1"
+                Eliminar = "delete from ms_consultas where id = :1"
                 cursor.execute(Eliminar, (id,))
                 self.conexion.connection.commit()
                 print(f"[####]: Consulta {id} eliminada correctamente")
@@ -313,6 +314,7 @@ class ConsultasModel:
                 return False
         except Exception as e:
             print(f"[####]: Error al eliminar la consulta {id} -> {e}")
+            return False
         
         finally:
             if cursor: 
@@ -323,7 +325,7 @@ class ConsultasModel:
         cursor = self.conexion.obtener_cursor()
 
         try:
-            Mostrar = "select id, id_paciente, id_medico, id_receta, fecha, comentarios from consultas"
+            Mostrar = "select id, id_paciente, id_medico, id_receta, fecha, comentarios from ms_consultas"
             cursor.execute(Mostrar)
             datos = cursor.fetchall()
 
@@ -356,7 +358,7 @@ class AgendaModel:
             cursor = self.conexion.obtener_cursor()
 
             try:
-                consulta_validacion = "select * from agenda where id = :1"
+                consulta_validacion = "select * from ms_agenda where id = :1"
                 cursor.execute(consulta_validacion, (id,))
 
                 if len(cursor.fetchall()) >0:
@@ -365,7 +367,7 @@ class AgendaModel:
                     return  False
                 
                 else:
-                    Insertar = "insert into agenda (id, id_paciente, id_medico, fecha_consulta, estado) values (:1, :2, :3, :4, :5)"
+                    Insertar = "insert into ms_agenda (id, id_paciente, id_medico, fecha_consulta, estado) values (:1, :2, :3, :4, :5)"
                     cursor.execute(Insertar, (id, id_paciente, id_medico, fecha_consulta, estado))
                     self.conexion.connection.commit()
                     print(f"[####]: Agenda {id} guardada correctamente")
@@ -384,13 +386,13 @@ class AgendaModel:
             cursor = self.conexion.obtener_cursor()
 
             try:
-                consulta_validacion = "select * from agenda where id = :1"
+                consulta_validacion = "select * from ms_agenda where id = :1"
                 cursor.execute(consulta_validacion, (id,))
 
-                if len(cursor.fetchall()) == 0:
+                if len(cursor.fetchall()) > 0:
                     if datos:
-                        Editar = "update agenda set id = :1, id_paciente = :2, id_medico = :3, fecha_consulta = :4, estado = :5 where id = :6"
-                        cursor.execute(Editar, (id, datos[0], datos[1], datos[2], datos[3], id))
+                        Editar = "update ms_agenda set fecha_consulta = :1, estado = :2 where id = :3"
+                        cursor.execute(Editar, (datos[0], datos[1], id,))
                         self.conexion.connection.commit()
                         print(f"[####]: Agenda {id} editada correctamente")
                 else:
@@ -410,11 +412,11 @@ class AgendaModel:
             cursor = self.conexion.obtener_cursor()
 
             try:
-                consulta_validacion = "select * from agenda where id = :1"
+                consulta_validacion = "select * from ms_agenda where id = :1"
                 cursor.execute(consulta_validacion, (id,))
                                
                 if len(cursor.fetchall()) >0:
-                    Eliminar = "delete from agenda where id = :1"
+                    Eliminar = "delete from ms_agenda where id = :1"
                     cursor.execute(Eliminar, (id,))
                     self.conexion.connection.commit()
                     print(f"[####]: Agenda {id} eliminada correctamente")
@@ -424,6 +426,7 @@ class AgendaModel:
                     return False
             except Exception as e:
                 print(f"[####]: Error al eliminar la agenda {id} -> {e}")
+                return False
             
             finally:
                 if cursor: 
@@ -434,7 +437,7 @@ class AgendaModel:
             cursor = self.conexion.obtener_cursor()
 
             try:
-                Mostrar = "select id, id_paciente, id_medico, fecha_consulta, estado from agenda"
+                Mostrar = "select id, id_paciente, id_medico, fecha_consulta, estado from ms_agenda"
                 cursor.execute(Mostrar)
                 datos = cursor.fetchall()
 

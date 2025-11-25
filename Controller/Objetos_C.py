@@ -42,7 +42,7 @@ class ConsultasController:
 
     def Registro_Consultas(self,id: int, id_paciente: int,id_medico: int, id_recetas: int, fecha: date, comentarios: str):
 
-        if patron.search(fecha) or patron.search(comentarios):
+        if patron.search(comentarios):
             print("[####]: No se puede ingresar codigo SQL en los strings")
 
             return False
@@ -55,7 +55,7 @@ class AgendaController:
 
     def Registro_Agenda(self,id: int, id_paciente: int,id_medico: int, fecha_consulta: date, tipo: str):
 
-        if patron.search(fecha_consulta) or patron.search(tipo):
+        if patron.search(tipo):
             print("[####]: No se puede ingresar codigo SQL en los strings")
 
             return False

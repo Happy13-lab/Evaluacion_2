@@ -42,24 +42,24 @@ class PacienteController:
     def __init__(self, Modelo: PacienteModel):
         self.Modelo = Modelo
 
-    def registrar_paciente(self, comuna: str, fecha_primera_visita: date):
+    def registrar_paciente(self,id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: date, telefono: int, email: str, tipo: str, comuna: str, fecha_primera_visita: date):
 
-        if not comuna or not fecha_primera_visita:
+        if not all(id,nombre_usuario,clave,nombre,apellido,fecha_nacimiento,telefono,email,tipo,comuna,fecha_primera_visita):
             print("[####]: Hace faltan datos en el registro de paciente")
             return False
         
-        if patron.search(comuna)or patron.search(fecha_primera_visita):
+        if patron.search(comuna) or patron.search(nombre) or patron.search(tipo):
             print("[####]: No se puede ingresar codigo SQL en los strings")
             return False
         
-        return self.Modelo.Crear_paciente(comuna, fecha_primera_visita)
+        return self.Modelo.Crear_paciente(id,nombre_usuario,clave,nombre,apellido,fecha_nacimiento,telefono,email,tipo,comuna,fecha_primera_visita)
     
     def listar_paciente(self) -> list:
         
-        paciente = self.Modelo.Mostrar_pacientes()
+        paciente = self.Modelo.Mostrar_paciente()
 
         if len(paciente) > 0:
-            return [ { "id": p[0], "comuna": p[1], "fecha_primera_visita": p[2] } for p in paciente ]
+            return [ { "id": p[0], "nombre_usuario": p[1], "clave": p[2],"nombre": p[3],"apellido": p[4],"fecha_nacimiento": p[5],"telefono": p[6],"email": p[7],"tipo": p[8], "comuna":p[9],"fecha_primera_visita":p[9] } for p in paciente ] 
 
         else:
             return []
@@ -69,14 +69,14 @@ class MedicoController:
     def __init__(self, Modelo: MedicoModel):
         self.Modelo = Modelo
 
-    def registrar_medico(self, especialidad: str, horario_atencion: time, fecha_ingreso:date):
+    def registrar_medico(self,id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: date, telefono: int, email: str, tipo: str, especialidad: str, horario_atencion: time, fecha_ingreso:date):
         
-        if not especialidad or not horario_atencion or not fecha_ingreso:
+        if not all(id,nombre_usuario,clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo,especialidad):
 
             print("[####]: Hace faltan datos en el registro de medico")
             return False
         
-        if patron.search(especialidad) or patron.search(horario_atencion) or patron.search(fecha_ingreso):
+        if patron.search(especialidad) or patron.search(nombre) or patron.search(tipo):
             print("[####]: No se puede ingresar codigo SQL en los strings")
             return False
         
@@ -84,7 +84,7 @@ class MedicoController:
     
     def listar_medico(self) -> list:
         
-        medico = self.Modelo.Mostrar_medicos()
+        medico = self.Modelo.mostrar_medico()
 
         if len(medico) > 0:
             return [ { "id": m[0], "especialidad": m[1], "horario_atencion": m[2], "fecha_ingreso": m[3] } for m in medico ]

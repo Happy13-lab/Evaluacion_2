@@ -11,9 +11,6 @@ class ConexionOracle:
         self.connection = None
 
     def conectar(self):
-        """
-            Genera la conexión con la bd según datos recibidos.\n
-        """
         try:
             self.connection = oracledb.connect(
                 user=self.usuario,
@@ -27,35 +24,32 @@ class ConexionOracle:
             print(f"[ERROR]: No se pudo conectar a BD → {error.message}")
 
     def desconectar(self):
-        """
-            Si es que hay una conexión activa, la finaliza.
-        """
         if self.connection:
             self.connection.close()
             print("[INFO]: Conexión a BD cerrada correctamente.")
 
     def obtener_cursor(self):
-        """
-            Genera el cursor para BD.
-        """
         if not self.connection:
             self.conectar()
 
         return self.connection.cursor()
     
 def validar_tablas(db):
-    """
-        Se encarga de crear la tablas en caso de que estas no existan.
-    """
+    
 
-    sql_usuario = """
+    ms_usuario = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE usuarios (
-                        id_usuario NUMBER PRIMARY KEY,
+                    CREATE TABLE ms_usuarios (
+                        id integer PRIMARY KEY,
+                        nombre_usuario VARCHAR2(100),
+                        clave VARCHAR2(100),
                         nombre VARCHAR2(100),
-                        telefono NUMBER,
-                        ubicacion VARCHAR2(100)
+                        apellido VARCHAR2(100),
+                        fecha_nacimiento date,
+                        telefono VARCHAR2(100),
+                        email VARCHAR2(100),
+                        tipo VARCHAR2(100)
                     )
                 ';
             EXCEPTION
@@ -66,16 +60,14 @@ def validar_tablas(db):
             END;
         """
     
-    sql_cliente = """
+    ms_paciente = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE clientes (
-                        id_cliente NUMBER PRIMARY KEY,
-                        nombre VARCHAR2(100),
-                        telefono NUMBER,
-                        nacionalidad VARCHAR2(50),
-                        habitacion NUMBER,
-                        CONSTRAINT fk_habitacion_cliente FOREIGN KEY (habitacion) REFERENCES habitaciones(id_habitacion)
+                    CREATE TABLE ms_paciente (
+                        id_paciente integer PRIMARY KEY,
+                        comuna VARCHAR2(100),
+                        fecha_primera_visita date,
+                        constraint fk_usuario_paciente FOREIGN KEY (id_paciente) REFERENCES ms_usuarios(id)
                     )
                 ';
             EXCEPTION
@@ -86,15 +78,33 @@ def validar_tablas(db):
             END;
         """
     
-    sql_inventario = """
+    ms_medico = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE inventario (
-                        id_inventario NUMBER PRIMARY KEY,
+                    CREATE TABLE ms_medico (
+                        id_medico INTEGER PRIMARY KEY,
+                        especialidad VARCHAR2(100),
+                        horario_atencion TIMESTAMP,
+                        fecha_ingreso DATE,
+                        CONSTRAINT fk_usuario_medico FOREIGN KEY (id_medico) REFERENCES ms_usuarios(id)
+                    )
+                ';
+            EXCEPTION
+                WHEN OTHERS THEN
+                    IF SQLCODE != -955 THEN
+                        RAISE;
+                    END IF;
+            END;
+        """
+
+    ms_insumos = """
+            BEGIN
+                EXECUTE IMMEDIATE '
+                    CREATE TABLE ms_insumos (
+                        id INTEGER PRIMARY KEY,
                         nombre VARCHAR2(100),
-                        tipo VARCHAR2(30),
-                        cantidad NUMBER,
-                        precio_costo NUMBER(8,2)
+                        tipo VARCHAR2(100),
+                        stock INTEGER
                     )
                 ';
             EXCEPTION
@@ -105,14 +115,16 @@ def validar_tablas(db):
             END;
         """
 
-    sql_habitaciones = """
+    ms_recetas = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE habitaciones (
-                        id_habitacion NUMBER PRIMARY KEY,
-                        numero_habitacion NUMBER UNIQUE,
-                        cantidad_personas NUMBER,
-                        estado VARCHAR2(15)
+                    CREATE TABLE ms_recetas (
+                        id_recetas INTEGER PRIMARY KEY,
+                        id_paciente INTEGER,
+                        id_medico INTEGER,
+                        descripcion VARCHAR2(100),
+                        CONSTRAINT fk_receta_paciente FOREIGN KEY (id_paciente) REFERENCES ms_paciente(id_paciente),
+                        CONSTRAINT fk_receta_medico FOREIGN KEY (id_medico) REFERENCES ms_medico(id_medico)
                     )
                 ';
             EXCEPTION
@@ -122,17 +134,19 @@ def validar_tablas(db):
                     END IF;
             END;
         """
-
-    sql_boletas = """
+    ms_consultas = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE boletas (
-                        id_boleta NUMBER PRIMARY KEY,
-                        folio NUMBER,
-                        usuario NUMBER,
-                        cliente NUMBER,
-                        CONSTRAINT fk_boleta_usuario FOREIGN KEY (usuario) REFERENCES usuarios(id_usuario),
-                        CONSTRAINT fk_boleta_cliente FOREIGN KEY (cliente) REFERENCES clientes(id_cliente)
+                    CREATE TABLE ms_consultas (
+                        id_consultas INTEGER PRIMARY KEY,
+                        id_paciente INTEGER,
+                        id_medico INTEGER,
+                        id_recetas INTEGER,
+                        fecha DATE,
+                        comentarios VARCHAR2(100),
+                        CONSTRAINT fk_consultas_paciente FOREIGN KEY (id_paciente) REFERENCES ms_paciente(id_paciente),
+                        CONSTRAINT fk_consultas_medico FOREIGN KEY (id_medico) REFERENCES ms_medico(id_medico),
+                        CONSTRAINT fk_consultas_recetas FOREIGN KEY (id_recetas) REFERENCES ms_recetas(id_recetas)
                     )
                 ';
             EXCEPTION
@@ -142,15 +156,36 @@ def validar_tablas(db):
                     END IF;
             END;
         """
-    
+    ms_agenda = """
+            BEGIN
+                EXECUTE IMMEDIATE '
+                    CREATE TABLE ms_agenda (
+                        id_agenda INTEGER PRIMARY KEY,
+                        id_paciente INTEGER,
+                        id_medico INTEGER,
+                        fecha_consulta DATE,
+                        descripcion VARCHAR2(100),
+                        CONSTRAINT fk_agenda_paciente FOREIGN KEY (id_paciente) REFERENCES ms_paciente(id_paciente),
+                        CONSTRAINT fk_agenda_medico FOREIGN KEY (id_medico) REFERENCES ms_medico(id_medico)
+                    )
+                ';
+            EXCEPTION
+                WHEN OTHERS THEN
+                    IF SQLCODE != -955 THEN
+                        RAISE;
+                    END IF;
+            END;
+        """
     cursor = db.obtener_cursor()
 
     sentencias = [
-        sql_habitaciones,
-        sql_usuario,
-        sql_inventario,
-        sql_cliente,
-        sql_boletas,
+        ms_usuario,
+        ms_paciente,
+        ms_medico,
+        ms_insumos,
+        ms_recetas,
+        ms_consultas,
+        ms_agenda
     ]
 
     try:
