@@ -11,7 +11,7 @@ class InsumoModel:
     
     def Crear_insumo(self, id, nombre, tipo, stock) -> bool:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             consulta_validacion = "select * from insumo where id = :1"
@@ -39,7 +39,7 @@ class InsumoModel:
     
     def editar_item( self, id: int, *datos: tuple) -> bool:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             consulta_validacion = "select * from insumo where id = :1"
@@ -65,7 +65,7 @@ class InsumoModel:
 
     def eliminar_item(self, id: int) -> bool:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             consulta_validacion = "select * from insumo where id = :1"
@@ -89,7 +89,7 @@ class InsumoModel:
     
     def Mostrar_item(self) -> list:
 
-        cursor = self.conexion.obterner_cursor()
+        cursor = self.conexion.obtener_cursor()
 
         try:
             Mostrar = "select id,nombre,tipo,stock from insumo"

@@ -1,4 +1,5 @@
 from confing.db_config import ConexionOracle
+from datetime import date
 class UsuarioModel:
     def __init__(self, id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: str, telefono: int, email: str, tipo: str, conexion: ConexionOracle):
         self.id = id
@@ -123,15 +124,6 @@ class PacienteModel(UsuarioModel):
     def __init__(self, id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: str, telefono: int, email: str, tipo: str, comuna: str, fecha_primera_visita: str, conexion: ConexionOracle):
         super().__init__(id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, conexion)
         
-        self.id = id
-        self.nombre_usuario = nombre_usuario
-        self.clave = clave
-        self.nombre = nombre
-        self.apellido = apellido
-        self.fecha_nacimiento = fecha_nacimiento
-        self.telefono = telefono
-        self.email = email
-        self.tipo = tipo
         self.comuna = comuna
         self.fecha_primera_visita = fecha_primera_visita
         self.conexion = conexion
@@ -249,21 +241,12 @@ class PacienteModel(UsuarioModel):
 
 class MedicoModel(UsuarioModel):
 
-    def __init__(self, id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: str, telefono: int, email: str, tipo: str, especialidad: str, id_medico: int,horario_ingreso: int, conexion: ConexionOracle):
+    def __init__(self, id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: str, telefono: int, email: str, tipo: str, especialidad: str, id_medico: int,horario_ingreso: int,fecha_ingreso: date, conexion: ConexionOracle):
         super().__init__(id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, conexion)
-        
-        self.id = id
-        self.nombre_usuario = nombre_usuario
-        self.clave = clave
-        self.nombre = nombre
-        self.apellido = apellido
-        self.fecha_nacimiento = fecha_nacimiento
-        self.telefono = telefono
-        self.email = email
-        self.tipo = tipo
         self.especialidad = especialidad
-        self.id_medico = id_medico
         self.horario_ingreso = horario_ingreso
+        self.fecha_ingreso = fecha_ingreso
+
         self.conexion = conexion
     
     def Crear_medico(self, id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso) -> bool:
