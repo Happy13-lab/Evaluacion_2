@@ -50,8 +50,8 @@ class ConsultasController:
             return self.model.insertar_consulta(id, id_paciente, id_medico, id_recetas, fecha, comentarios)
 
 class AgendaController:
-    def __init__(self, Model:AgendaModel):
-        self.model = Model
+    def __init__(self, Modelo:AgendaModel):
+        self.Modelo = Modelo
 
     def Registro_Agenda(self,id: int, id_paciente: int,id_medico: int, fecha_consulta: date, tipo: str):
 
@@ -60,6 +60,6 @@ class AgendaController:
 
             return False
         else:
-            return self.model.insertar_agenda(id, id_paciente, id_medico, fecha_consulta, tipo)
+            return self.Modelo.insertar_agenda(id, id_paciente, id_medico, fecha_consulta, tipo)
 
 
