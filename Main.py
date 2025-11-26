@@ -6,6 +6,7 @@ from Controller.Objetos_C import RecetasController, ConsultasController,InsumoCo
 from Controller.Personas_C import UsuarioController,PacienteController,MedicoController
 from View.Objetos_v import RecetasView,AgendaView,ConsultaView,InsumoView
 from View.Persona_v import UsuarioView,PacienteView,MedicoView
+from datetime import date
 
 
 def conectarBD():
@@ -20,36 +21,32 @@ def conectarBD():
 def main():
     conexion = conectarBD()
 
-    print("Inicio de sesión, ingrese sus credenciales\n")
-    usuario = str(input("Ingrese su nombre de usuario: "))
-    clave = str(input("Ingrese su clave: "))
-    clave = bytes(clave, encoding="utf-8")
+    
+def main():
+    conexion = ConexionOracle()
+    
+    modelo_usuario = UsuarioModel(0, "", "", "", "", date.today(), 0, "", "", conexion)
+    usuario_controller = UsuarioController(modelo_usuario)
+    
+    print("Registro de usuario\n")
+    id = int(input("Ingrese ID: "))
+    nombre_usuario = input("Ingrese nombre de usuario: ")
+    clave = input("Ingrese clave: ")
+    nombre = input("Ingrese nombre: ")
+    apellido = input("Ingrese apellido: ")
+    fecha_nacimiento = date(input("Ingrese fecha de nacimiento (YYYY-MM-DD): "))
+    telefono = int(input("Ingrese teléfono: "))
+    email = input("Ingrese email: ")
+    tipo = input("Ingrese tipo de usuario: ")
 
-    salt = bcrypt.gensalt()
-    clave_encriptada = bcrypt.hashpw(clave, salt)
-    clave_encriptada = clave_encriptada.decode(encoding="utf-8")
+    usuario_controller.registrar_usuario(id, nombre_usuario, clave, nombre, apellido,
+                                         fecha_nacimiento, telefono, email, tipo)
 
-    cursor = conexion.obtener_cursor()
+    print("\nInicio de sesión\n")
+    nombre_usuario = input("Ingrese nombre de usuario: ")
+    clave = input("Ingrese clave: ")
 
-    consulta = "insert into usuarios (nombre_usuario, clave) values (:1, :2)"
-    cursor.execute(consulta, (usuario, clave_encriptada,))
-    conexion.connection.commit()
-
-    usuario = str(input("Ingrese su nombre de usuario: "))
-    clave = str(input("Ingrese su clave: "))
-
-    consulta = "select clave from usuarios where nombre_usuario = :1"
-    cursor.execute(consulta, (usuario,))
-    clave_bd = cursor.fetchone()
-    clave_bytes = bytes(clave, encoding="utf-8")
-    clave_test = bytes(clave_bd[0], encoding="utf-8",)
-
-    validacion_clave = bcrypt.checkpw(clave_bytes, clave_test)
-
-    if validacion_clave:
-        print("Ingreso correcto")
-    else:
-        print("Credenciales incorrectas")
+    usuario_controller.validar(nombre_usuario, clave)
 
     conexion.desconectar()
 

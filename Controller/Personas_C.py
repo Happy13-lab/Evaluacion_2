@@ -1,6 +1,7 @@
 import re
 from datetime import date,time
 from Model.Personas_M import UsuarioModel,PacienteModel,MedicoModel
+import bcrypt
 
 SUS_KEYS = [
     r";", r"--", r"/\*", r"\bOR\b", r"\bAND\b", r"\bUNION\b",
@@ -36,6 +37,24 @@ class UsuarioController:
 
         else:
             return []
+        
+    def validar(self, nombre_usuario: str, clave: str) -> bool:
+
+        usuario = self.Modelo.obtener_usuario(nombre_usuario)
+        if not usuario:
+            print("[####]: Usuario no encontrado")
+            return False
+
+        clave_hash = usuario[2]
+        clave_bytes = clave.encode("utf-8")
+        clave_hash_bytes = clave_hash.encode("utf-8")
+
+        if bcrypt.checkpw(clave_bytes, clave_hash_bytes):
+            print("[####]: Ingreso correcto")
+            return True
+        else:
+            print("[####]: Credenciales incorrectas")
+            return False
         
 class PacienteController:
 
