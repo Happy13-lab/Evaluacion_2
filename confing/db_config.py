@@ -37,10 +37,10 @@ class ConexionOracle:
 def validar_tablas(db):
     
 
-    ms_usuario = """
+    LVMS_usuario = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE ms_usuarios (
+                    CREATE TABLE LVMS_usuarios (
                         id integer PRIMARY KEY,
                         nombre_usuario VARCHAR2(100),
                         clave VARCHAR2(100),
@@ -60,10 +60,10 @@ def validar_tablas(db):
             END;
         """
     
-    ms_paciente = """
+    LVMS_paciente = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE ms_paciente (
+                    CREATE TABLE LVMS_paciente (
                         id_paciente integer PRIMARY KEY,
                         comuna VARCHAR2(100),
                         fecha_primera_visita date,
@@ -78,10 +78,10 @@ def validar_tablas(db):
             END;
         """
     
-    ms_medico = """
+    LVMS_medico = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE ms_medico (
+                    CREATE TABLE LVMS_medico (
                         id_medico INTEGER PRIMARY KEY,
                         especialidad VARCHAR2(100),
                         horario_atencion TIMESTAMP,
@@ -97,10 +97,10 @@ def validar_tablas(db):
             END;
         """
 
-    ms_insumos = """
+    LVMS_insumos = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE ms_insumos (
+                    CREATE TABLE LVMS_insumos (
                         id INTEGER PRIMARY KEY,
                         nombre VARCHAR2(100),
                         tipo VARCHAR2(100),
@@ -115,10 +115,10 @@ def validar_tablas(db):
             END;
         """
 
-    ms_recetas = """
+    LVMS_recetas = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE ms_recetas (
+                    CREATE TABLE LVMS_recetas (
                         id_recetas INTEGER PRIMARY KEY,
                         id_paciente INTEGER,
                         id_medico INTEGER,
@@ -134,10 +134,10 @@ def validar_tablas(db):
                     END IF;
             END;
         """
-    ms_consultas = """
+    LVMS_consultas = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE ms_consultas (
+                    CREATE TABLE LVMS_consultas (
                         id_consultas INTEGER PRIMARY KEY,
                         id_paciente INTEGER,
                         id_medico INTEGER,
@@ -156,10 +156,10 @@ def validar_tablas(db):
                     END IF;
             END;
         """
-    ms_agenda = """
+    LVMS_agenda = """
             BEGIN
                 EXECUTE IMMEDIATE '
-                    CREATE TABLE ms_agenda (
+                    CREATE TABLE LVMS_agenda (
                         id_agenda INTEGER PRIMARY KEY,
                         id_paciente INTEGER,
                         id_medico INTEGER,
@@ -176,16 +176,40 @@ def validar_tablas(db):
                     END IF;
             END;
         """
+    
+    LVMS_administrador = """
+            BEGIN
+                EXECUTE IMMEDIATE '
+                    CREATE TABLE LVMS_administrador (
+                        id integer PRIMARY KEY,
+                        nombre_usuario VARCHAR2(100),
+                        clave VARCHAR2(100),
+                        nombre VARCHAR2(100),
+                        apellido VARCHAR2(100),
+                        fecha_nacimiento date,
+                        telefono VARCHAR2(100),
+                        email VARCHAR2(100),
+                        tipo VARCHAR2(100)
+                    )
+                ';
+            EXCEPTION
+                WHEN OTHERS THEN
+                    IF SQLCODE != -955 THEN
+                        RAISE;
+                    END IF;
+            END;
+        """
     cursor = db.obtener_cursor()
 
     sentencias = [
-        ms_usuario,
-        ms_paciente,
-        ms_medico,
-        ms_insumos,
-        ms_recetas,
-        ms_consultas,
-        ms_agenda
+        LVMS_usuario,
+        LVMS_paciente,
+        LVMS_medico,
+        LVMS_insumos,
+        LVMS_recetas,
+        LVMS_consultas,
+        LVMS_agenda,
+        LVMS_administrador
     ]
 
     try:

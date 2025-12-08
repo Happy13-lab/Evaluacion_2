@@ -34,4 +34,14 @@ class MedicoView:
         else:
             print("[####] Sin registro de medico")
 
-    
+class AdministradorView:
+    @staticmethod
+    def Vista_medico(medico: list) -> None:
+
+        if len(medico) >0:
+            print("\n[####]: - Administrador -")
+            
+            for i in medico:
+                 print(f"[INFO]:--- ID: {i['id']} | Nombre_usuario: {i['nombre_usuario']} | Clave: {i['clave']} | Nombre: {i['nombre']} | Apellido: {i['apellido']} | Fecha_nacimiento: {i['fecha_nacimiento']} | Telefono: {i['telefono']} | Email: {i['email']} | Tipo: {i['tipo']} ")
+        else:
+            print("[####] Sin registro de administrador")

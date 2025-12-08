@@ -67,7 +67,7 @@ class PacienteController:
             print("[####]: Hace faltan datos en el registro de paciente")
             return False
         
-        if patron.search(comuna) or patron.search(nombre) or patron.search(tipo):
+        if patron.search(comuna) or patron.search(nombre) or patron.search(tipo) or patron.search(nombre_usuario) or patron.search(email):
             print("[####]: No se puede ingresar codigo SQL en los strings")
             return False
         
@@ -82,6 +82,24 @@ class PacienteController:
 
         else:
             return []
+        
+    def validar(self, nombre_usuario: str, clave: str) -> bool:
+    
+        usuario = self.Modelo.obtener_usuario(nombre_usuario)
+        if not usuario:
+            print("[####]:Paciente no encontrado")
+            return False
+
+        clave_hash = usuario[2]
+        clave_bytes = clave.encode("utf-8")
+        clave_hash_bytes = clave_hash.encode("utf-8")
+
+        if bcrypt.checkpw(clave_bytes, clave_hash_bytes):
+            print("[####]: Ingreso correcto")
+            return True
+        else:
+            print("[####]: Credenciales incorrectas")
+            return False
 
 class MedicoController:
 
@@ -95,7 +113,7 @@ class MedicoController:
             print("[####]: Hace faltan datos en el registro de medico")
             return False
         
-        if patron.search(especialidad) or patron.search(nombre) or patron.search(tipo):
+        if patron.search(especialidad) or patron.search(nombre) or patron.search(tipo) or patron.search(nombre_usuario) or patron.search(apellido) or patron.search(email) or patron.search(clave):
             print("[####]: No se puede ingresar codigo SQL en los strings")
             return False
         
@@ -110,4 +128,22 @@ class MedicoController:
 
         else:
             return []
+        
+    def validar(self, nombre_usuario: str, clave: str) -> bool:
+    
+        usuario = self.Modelo.obtener_usuario(nombre_usuario)
+        if not usuario:
+            print("[####]: Doctor no encontrado")
+            return False
+
+        clave_hash = usuario[2]
+        clave_bytes = clave.encode("utf-8")
+        clave_hash_bytes = clave_hash.encode("utf-8")
+
+        if bcrypt.checkpw(clave_bytes, clave_hash_bytes):
+            print("[####]: Ingreso correcto")
+            return True
+        else:
+            print("[####]: Credenciales incorrectas")
+            return False
 
