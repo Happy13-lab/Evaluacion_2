@@ -1,6 +1,6 @@
 import re
 from datetime import date,time
-from Model.Personas_M import UsuarioModel,PacienteModel,MedicoModel
+from Model.Personas_M import UsuarioModel,PacienteModel,MedicoModel, AdministradorModel
 import bcrypt
 
 SUS_KEYS = [
@@ -134,6 +134,51 @@ class MedicoController:
         usuario = self.Modelo.obtener_usuario(nombre_usuario)
         if not usuario:
             print("[####]: Doctor no encontrado")
+            return False
+
+        clave_hash = usuario[2]
+        clave_bytes = clave.encode("utf-8")
+        clave_hash_bytes = clave_hash.encode("utf-8")
+
+        if bcrypt.checkpw(clave_bytes, clave_hash_bytes):
+            print("[####]: Ingreso correcto")
+            return True
+        else:
+            print("[####]: Credenciales incorrectas")
+            return False
+        
+class AdministradorController:
+    
+    def __init__(self, Modelo: AdministradorModel):
+        self.Modelo = Modelo
+
+    def registrar_administrador(self,id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: date, telefono: int, email: str, tipo: str) -> bool:
+
+        if not id or not nombre_usuario or not clave or not nombre or not apellido or not fecha_nacimiento or not telefono or not email or not tipo:
+            print("[####]: Hace faltan datos en el registro de usuario")
+            return False
+        
+        if patron.search(nombre) or patron.search(tipo):
+            print("[####]: No se puede ingresar codigo SQL en los strings")
+            return False
+        
+        return self.Modelo.Crear_administrador(id,nombre_usuario,clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo)
+    
+    def listar_administrador(self) -> list:
+        
+        usuario = self.Modelo.Mostrar_usuarios()
+
+        if len(usuario) > 0:
+            return [ { "id": u[0], "nombre_usuario": u[1], "clave": u[2],"nombre": u[3],"apellido": u[4],"fecha_nacimiento": u[5],"telefono": u[6],"email": u[7],"tipo": u[8] } for u in usuario ]
+
+        else:
+            return []
+        
+    def validar(self, nombre_usuario: str, clave: str) -> bool:
+
+        usuario = self.Modelo.obtener_usuario(nombre_usuario)
+        if not usuario:
+            print("[####]: administrador no encontrado")
             return False
 
         clave_hash = usuario[2]

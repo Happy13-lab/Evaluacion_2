@@ -1,6 +1,6 @@
 import re
 from Model.Objetos_M import InsumoModel, RecetasModel, ConsultasModel, AgendaModel
-from datetime import date
+from datetime import date, datetime
 
 SUS_KEYS = [
     r";", r"--", r"/\*", r"\bOR\b", r"\bAND\b", r"\bUNION\b",

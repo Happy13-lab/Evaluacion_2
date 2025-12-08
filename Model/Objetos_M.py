@@ -49,7 +49,7 @@ class InsumoModel:
             if len(cursor.fetchall()) > 0:
                 if datos:
                     Editar = "update MSLV_insumos set nombre = :1, tipo = :2, stock = :3, costo_usd = :4 where id = :5"
-                    cursor.execute(Editar, (datos[0], datos[1], datos[2], datos[3] id,))
+                    cursor.execute(Editar, (datos[0], datos[1], datos[2], datos[3], id,))
                     self.conexion.connection.commit()
                     print(f"[####]: Item {id} editado correctamente")
                     return True
@@ -166,7 +166,7 @@ class RecetasModel:
             if len(cursor.fetchall()) > 0:
                 if datos:
                     Editar = "update LVMS_recetas set  descripcion = :1, medicamentos_recetados = :2, costo_clp = :3 where id = :4"
-                    cursor.execute(Editar, (datos[0], datos[1], datos[2] id,))
+                    cursor.execute(Editar, (datos[0], datos[1], datos[2], id,))
                     self.conexion.connection.commit()
                     print(f"[####]: Receta {id} editada correctamente")
                     return True
