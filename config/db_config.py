@@ -34,7 +34,7 @@ class ConexionOracle:
 
         return self.connection.cursor()
     
-def validar_tablas(db):
+def validar_tablas(db: ConexionOracle):
     
 
     LVMS_usuario = """
@@ -43,7 +43,7 @@ def validar_tablas(db):
                     CREATE TABLE LVMS_usuarios (
                         id integer PRIMARY KEY,
                         nombre_usuario VARCHAR2(100),
-                        clave VARCHAR2(100),
+                        clave VARCHAR2(250),
                         nombre VARCHAR2(100),
                         apellido VARCHAR2(100),
                         fecha_nacimiento date,
@@ -67,7 +67,7 @@ def validar_tablas(db):
                         id_paciente integer PRIMARY KEY,
                         comuna VARCHAR2(100),
                         fecha_primera_visita date,
-                        constraint fk_usuario_paciente FOREIGN KEY (id_paciente) REFERENCES ms_usuarios(id)
+                        constraint fk_usuario_paciente FOREIGN KEY (id_paciente) REFERENCES LVMS_usuarios(id)
                     )
                 ';
             EXCEPTION
@@ -86,7 +86,7 @@ def validar_tablas(db):
                         especialidad VARCHAR2(100),
                         horario_atencion TIMESTAMP,
                         fecha_ingreso DATE,
-                        CONSTRAINT fk_usuario_medico FOREIGN KEY (id_medico) REFERENCES ms_usuarios(id)
+                        CONSTRAINT fk_usuario_medico FOREIGN KEY (id_medico) REFERENCES LVMS_usuarios(id)
                     )
                 ';
             EXCEPTION
@@ -104,7 +104,8 @@ def validar_tablas(db):
                         id INTEGER PRIMARY KEY,
                         nombre VARCHAR2(100),
                         tipo VARCHAR2(100),
-                        stock INTEGER
+                        stock INTEGER,
+                        costo_usd float
                     )
                 ';
             EXCEPTION
@@ -123,8 +124,8 @@ def validar_tablas(db):
                         id_paciente INTEGER,
                         id_medico INTEGER,
                         descripcion VARCHAR2(100),
-                        CONSTRAINT fk_receta_paciente FOREIGN KEY (id_paciente) REFERENCES ms_paciente(id_paciente),
-                        CONSTRAINT fk_receta_medico FOREIGN KEY (id_medico) REFERENCES ms_medico(id_medico)
+                        CONSTRAINT fk_receta_paciente FOREIGN KEY (id_paciente) REFERENCES LVMS_paciente(id_paciente),
+                        CONSTRAINT fk_receta_medico FOREIGN KEY (id_medico) REFERENCES LVMS_medico(id_medico)
                     )
                 ';
             EXCEPTION
@@ -144,9 +145,9 @@ def validar_tablas(db):
                         id_recetas INTEGER,
                         fecha DATE,
                         comentarios VARCHAR2(100),
-                        CONSTRAINT fk_consultas_paciente FOREIGN KEY (id_paciente) REFERENCES ms_paciente(id_paciente),
-                        CONSTRAINT fk_consultas_medico FOREIGN KEY (id_medico) REFERENCES ms_medico(id_medico),
-                        CONSTRAINT fk_consultas_recetas FOREIGN KEY (id_recetas) REFERENCES ms_recetas(id_recetas)
+                        CONSTRAINT fk_consultas_paciente FOREIGN KEY (id_paciente) REFERENCES LVMS_paciente(id_paciente),
+                        CONSTRAINT fk_consultas_medico FOREIGN KEY (id_medico) REFERENCES LVMS_medico(id_medico),
+                        CONSTRAINT fk_consultas_recetas FOREIGN KEY (id_recetas) REFERENCES LVMS_recetas(id_recetas)
                     )
                 ';
             EXCEPTION
@@ -165,8 +166,8 @@ def validar_tablas(db):
                         id_medico INTEGER,
                         fecha_consulta DATE,
                         descripcion VARCHAR2(100),
-                        CONSTRAINT fk_agenda_paciente FOREIGN KEY (id_paciente) REFERENCES ms_paciente(id_paciente),
-                        CONSTRAINT fk_agenda_medico FOREIGN KEY (id_medico) REFERENCES ms_medico(id_medico)
+                        CONSTRAINT fk_agenda_paciente FOREIGN KEY (id_paciente) REFERENCES LVMS_paciente(id_paciente),
+                        CONSTRAINT fk_agenda_medico FOREIGN KEY (id_medico) REFERENCES LVMS_medico(id_medico)
                     )
                 ';
             EXCEPTION
@@ -183,7 +184,7 @@ def validar_tablas(db):
                     CREATE TABLE LVMS_administrador (
                         id integer PRIMARY KEY,
                         nombre_usuario VARCHAR2(100),
-                        clave VARCHAR2(100),
+                        clave VARCHAR2(250),
                         nombre VARCHAR2(100),
                         apellido VARCHAR2(100),
                         fecha_nacimiento date,

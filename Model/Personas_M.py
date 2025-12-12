@@ -1,4 +1,4 @@
-from confing.db_config import ConexionOracle
+from config.db_config import ConexionOracle
 from datetime import date
 from datetime import time
 class UsuarioModel:
@@ -114,6 +114,44 @@ class UsuarioModel:
         finally:
             if cursor:
                 cursor.close()
+    
+    # En Model/Personas_M.py (dentro de UsuarioModel)
+# En Model/Personas_M.py (dentro de la clase UsuarioModel)
+
+def obtener_usuario(self, nombre_usuario: str):
+    """
+    Busca un usuario en la BD por su nombre de usuario.
+    Necesario para el proceso de validación (login).
+    """
+    cursor = self.conexion.obtener_cursor()
+    try:
+        # Consulta SQL parametrizada. 
+        # Selecciona todos los campos necesarios, ¡incluyendo la CLAVE!
+        consulta = """
+            SELECT 
+                id, nombre_usuario, clave, nombre, apellido, 
+                fecha_nacimiento, telefono, email, tipo 
+            FROM 
+                LVMS_usuarios 
+            WHERE 
+                nombre_usuario = :1
+        """
+        # Ejecuta la consulta usando la parametrización
+        cursor.execute(consulta, (nombre_usuario,))
+        dato = cursor.fetchone() 
+        
+        # Devuelve la tupla con los datos (o None si no encuentra)
+        return dato
+        
+    except Exception as e:
+        # Reporta el error del modelo (la lógica de mostrarlo al usuario está en el Controller)
+        print(f"[ERROR_MODELO]: Error en obtener_usuario → {e}")
+        return None
+        
+    finally:
+        if cursor:
+            cursor.close()
+        
 
 
 class PacienteModel(UsuarioModel):
@@ -231,11 +269,12 @@ class PacienteModel(UsuarioModel):
 
 class MedicoModel(UsuarioModel):
 
-    def __init__(self, id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: str, telefono: int, email: str, tipo: str, especialidad: str, id_medico: int,horario_ingreso: time, conexion: ConexionOracle):
+    def __init__(self, id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: date, telefono: int, email: str, tipo: str, especialidad: str, id_medico: int,horario_ingreso: time,fecha_ingreso: date, conexion: ConexionOracle):
         super().__init__(id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, conexion)
         self.especialidad = especialidad
         self.id_medico = id_medico
         self.horario_ingreso = horario_ingreso
+        self.fecha_ingreso = fecha_ingreso
         self.conexion = conexion
     
     def Crear_medico(self, id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso) -> bool:

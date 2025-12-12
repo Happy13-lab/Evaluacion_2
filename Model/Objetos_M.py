@@ -1,4 +1,4 @@
-from confing.db_config import ConexionOracle
+from config.db_config import ConexionOracle
 from datetime import date
 
 class InsumoModel:

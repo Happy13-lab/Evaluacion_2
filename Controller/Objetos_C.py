@@ -12,8 +12,9 @@ patron = re.compile("|".join(SUS_KEYS), re.IGNORECASE)
 
 
 class InsumoController:
-    def __init__(self, Model: InsumoModel):
+    def __init__(self, Model: InsumoModel, tasa_cambio: float):
         self.model = Model
+        self.tasa_cambio = tasa_cambio
 
     def Registro_insumo(self,id: int, nombre: str, tipo: str, stock: int, costo_usd: float):
 
