@@ -26,7 +26,11 @@ class UsuarioController:
             print("[####]: No se puede ingresar codigo SQL en los strings")
             return False
         
-        return self.Modelo.Crear_usuario(id,nombre_usuario,clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo)
+        clave_bytes = clave.encode('utf-8')
+        clave_hash = bcrypt.hashpw(clave_bytes, bcrypt.gensalt(12)) 
+        clave_hash_str = clave_hash.decode('utf-8')
+        
+        return self.Modelo.Crear_usuario(id,nombre_usuario, clave_hash , nombre, apellido, fecha_nacimiento, telefono, email, tipo)
     
     def listar_usuario(self) -> list:
         
@@ -71,7 +75,11 @@ class PacienteController:
             print("[####]: No se puede ingresar codigo SQL en los strings")
             return False
         
-        return self.Modelo.Crear_paciente(id,nombre_usuario,clave,nombre,apellido,fecha_nacimiento,telefono,email,tipo,comuna,fecha_primera_visita)
+        clave_bytes = clave.encode('utf-8')
+        clave_hash = bcrypt.hashpw(clave_bytes, bcrypt.gensalt(12)) 
+        clave_hash_str = clave_hash.decode('utf-8')
+        
+        return self.Modelo.Crear_paciente(id,nombre_usuario,clave_hash ,nombre,apellido,fecha_nacimiento,telefono,email,tipo,comuna,fecha_primera_visita)
     
     def listar_paciente(self) -> list:
         
@@ -108,7 +116,7 @@ class MedicoController:
 
     def registrar_medico(self,id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: date, telefono: int, email: str, tipo: str, especialidad: str, horario_atencion: time, fecha_ingreso:date):
         
-        if not all(id,nombre_usuario,clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo,especialidad):
+        if not all(id,nombre_usuario,clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo,especialidad, horario_atencion, fecha_ingreso):
 
             print("[####]: Hace faltan datos en el registro de medico")
             return False
@@ -117,7 +125,11 @@ class MedicoController:
             print("[####]: No se puede ingresar codigo SQL en los strings")
             return False
         
-        return self.Modelo.Crear_medico(especialidad, horario_atencion, fecha_ingreso)
+        clave_bytes = clave.encode('utf-8')
+        clave_hash = bcrypt.hashpw(clave_bytes, bcrypt.gensalt(12)) 
+        clave_hash_str = clave_hash.decode('utf-8')
+        
+        return self.Modelo.Crear_medico(id,nombre_usuario,clave_hash, nombre, apellido, fecha_nacimiento, telefono, email, tipo,especialidad, horario_atencion, fecha_ingreso)
     
     def listar_medico(self) -> list:
         
@@ -162,7 +174,11 @@ class AdministradorController:
             print("[####]: No se puede ingresar codigo SQL en los strings")
             return False
         
-        return self.Modelo.Crear_administrador(id,nombre_usuario,clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo)
+        clave_bytes = clave.encode('utf-8')
+        clave_hash = bcrypt.hashpw(clave_bytes, bcrypt.gensalt(12)) 
+        clave_hash_str = clave_hash.decode('utf-8')
+        
+        return self.Modelo.Crear_usuario(id,nombre_usuario, clave_hash , nombre, apellido, fecha_nacimiento, telefono, email, tipo)
     
     def listar_administrador(self) -> list:
         

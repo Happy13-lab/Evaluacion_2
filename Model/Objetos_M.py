@@ -11,25 +11,21 @@ class InsumoModel:
         self.conexion = conexion
     
     def Crear_insumo(self, id, nombre, tipo, stock, costo_usd) -> bool:
-
         cursor = self.conexion.obtener_cursor()
-
         try:
             consulta_validacion = "select * from LVMS_insumos where id = :1"
             cursor.execute(consulta_validacion, (id,))
 
             if len(cursor.fetchall()) >0:
                 print(f"[####]: Ya existe un item con el nombre {id}")
-
-                return  False
-            
+                return  False          
             else:
                 Insertar = "insert into LVMS_insumos (id,nombre, tipo, stock, costo_usd) values (:1, :2, :3, :4, :5)"
                 cursor.execute(Insertar, (id, nombre, tipo, stock, costo_usd))
                 self.conexion.connection.commit()
                 print(f"[####]: Item {id} guardado correctamente")
                 return True
-        
+       
         except Exception as e:
             print(f"[####]: Error al guardar el item {id} -> {e}")
             return False

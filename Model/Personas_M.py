@@ -15,17 +15,13 @@ class UsuarioModel:
         self.conexion = conexion
     
     def Crear_usuario(self,id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo) -> bool:
-
         cursor = self.conexion.obtener_cursor()
-
         try:
             Validacion = "select * from LVMS_usuarios where id = :1"
             cursor.execute(Validacion, (id,))
-
             if len(cursor.fetchall()) > 0:
                 print(f"[####]: El usuario con el id: {id} proporcionado ya existe.")
-                return False
-            
+                return False            
             else: 
                 Insertar = "insert into LVMS_usuarios (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo) values (:1, :2, :3, :4, :5, :6, :7, :8, :9)"
                 cursor.execute(Insertar, (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo))
@@ -125,8 +121,6 @@ def obtener_usuario(self, nombre_usuario: str):
     """
     cursor = self.conexion.obtener_cursor()
     try:
-        # Consulta SQL parametrizada. 
-        # Selecciona todos los campos necesarios, ¡incluyendo la CLAVE!
         consulta = """
             SELECT 
                 id, nombre_usuario, clave, nombre, apellido, 
@@ -136,15 +130,12 @@ def obtener_usuario(self, nombre_usuario: str):
             WHERE 
                 nombre_usuario = :1
         """
-        # Ejecuta la consulta usando la parametrización
         cursor.execute(consulta, (nombre_usuario,))
         dato = cursor.fetchone() 
         
-        # Devuelve la tupla con los datos (o None si no encuentra)
         return dato
         
     except Exception as e:
-        # Reporta el error del modelo (la lógica de mostrarlo al usuario está en el Controller)
         print(f"[ERROR_MODELO]: Error en obtener_usuario → {e}")
         return None
         
@@ -274,20 +265,16 @@ class MedicoModel(UsuarioModel):
         self.especialidad = especialidad
         self.id_medico = id_medico
         self.horario_ingreso = horario_ingreso
-        self.fecha_ingreso = fecha_ingreso
-        self.conexion = conexion
+        self.fecha_ingreso = fecha_ingreso    
     
     def Crear_medico(self, id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso) -> bool:
 
         cursor = self.conexion.obtener_cursor()
-
         try:
             Validacion = "select * from LVMS_medico where id = :1"
             cursor.execute(Validacion, (id,))
-
             if len(cursor.fetchall()) > 0:
                 print(f"[####]: El médico con el {id} proporcionado ya existe.")
-
                 return False
             
             else: 

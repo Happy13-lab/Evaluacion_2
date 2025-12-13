@@ -129,10 +129,10 @@ def setup_dependencies(conexion):
     """
     # Instanciación de Modelos 
     # Los argumentos iniciales (0, "", etc.) son solo para inicializar el objeto.
-    m_usuario = UsuarioModel(0, "", "", "", "", date.today(), 0, "", "", conexion)
+    m_usuario = UsuarioModel(id=0, nombre_usuario="", clave="", nombre="", apellido="", fecha_nacimiento=date.today(),telefono=0, email="", tipo="", conexion=conexion)
     m_paciente = PacienteModel(id=0, nombre_usuario="", clave="", nombre="", apellido="", fecha_nacimiento=date.today(),telefono=0, email="", tipo="", conexion=conexion, comuna="", fecha_primera_visita=date.today())
     m_medico = MedicoModel(id=0, nombre_usuario="", clave="", nombre="", apellido="", fecha_nacimiento=date.today(),telefono=0, email="", tipo="", conexion=conexion,especialidad="", id_medico=0, horario_ingreso=datetime.now(),fecha_ingreso=date.today())
-    m_admin = AdministradorModel(0, "", "", "", "", date.today(), 0, "", "", conexion)
+    m_admin = AdministradorModel(id=0, nombre_usuario="", clave="", nombre="", apellido="", fecha_nacimiento=date.today(),telefono=0, email="", tipo="", conexion=conexion)
     m_insumo = InsumoModel(0, "", "", 0, 0.0, conexion)
     m_receta = RecetasModel(id=0, id_paciente=0, id_medico=0, descripcion="", medicamentos_recetados="", costo_clp=0, conexion=conexion)
     m_consulta = ConsultasModel(id=0, id_paciente=0, id_medico=0, id_receta=0, fecha=date.today(), comentarios="", valor=0, conexion=conexion)
@@ -154,24 +154,20 @@ def setup_dependencies(conexion):
         'Insumo': InsumoView, 'Receta': RecetasView, 'Agenda': AgendaView, 'Consulta': ConsultaView
     }
 
-    # Retornar un diccionario o tupla con todos los componentes
+    # Retornar un di
+    # pccionario o tupla con todos los componentes
     return {
         'controllers': {'usuario': c_usuario, 'paciente': c_paciente, 'medico': c_medico, 'admin': c_admin, 'insumo': c_insumo},
         'vistas': vistas
     }
 
-def importar_usuarios_desde_json(usuario_controller, admin_controller):
-    """
-    Carga usuarios iniciales (y un administrador por defecto) desde el JSON.
-    """
-    # 1. Crear un Administrador por defecto (si no existe)
-    # Esto asegura que siempre haya un usuario de tipo 'Administrador'
-    # La clave debe ser hasheada por el controlador!
+def importar_usuarios_desde_json(usuario_controller):
+
     print("\n[INFO]: Asegurando existencia de Administrador por defecto...")
     usuario_controller.registrar_usuario(
         id=1,
         nombre_usuario="admin",
-        clave="admin123", # El controlador DEBE hashear esto
+        clave="admin123", 
         nombre="Super",
         apellido="Admin",
         fecha_nacimiento=date(1990, 1, 1),
@@ -179,29 +175,23 @@ def importar_usuarios_desde_json(usuario_controller, admin_controller):
         email="admin@mediplus.cl",
         tipo="Administrador"
     )
-
-    # 2. Importar usuarios del JSON
     try:
         with open("users.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
-            
+            data = json.load(f)     
         print("[INFO]: Importando usuarios desde users.json...")
 
         for u in data:
-            # Usar un ID mayor para evitar colisión con el admin por defecto
             user_id = u["id"] + 100 
-            
-            # Usar clave temporal, el controlador la hashea.
             usuario_controller.registrar_usuario(
                 id=user_id,
                 nombre_usuario=u["username"],
-                clave="temp" + str(user_id), # Clave temporal para usuarios importados
+                clave="temp" + str(user_id), 
                 nombre=u["name"],
                 apellido=u.get("surname", "N/A"),
-                fecha_nacimiento=date(2000, 1, 1), # Fecha por defecto
+                fecha_nacimiento=date(2000, 1, 1), 
                 telefono=u["phone"],
                 email=u["email"],
-                tipo="Paciente" # Asignamos un tipo por defecto, ejemplo: Paciente
+                tipo="Paciente" 
             )
         print("[INFO]: Importación de usuarios finalizada.")
 
@@ -226,7 +216,6 @@ def menu_principal(controllers, vistas, usuario_autenticado):
         print("2. Gestión de Insumos (CRUD)")
         print("3. Editar mi Perfil")
         print("4. Cerrar Sesión")
-        # Aquí se implementaría la lógica de sub-menús llamando a los Controladores/Vistas
 
     elif tipo_usuario == 'Medico':
         # Menú del Médico
