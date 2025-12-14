@@ -112,36 +112,36 @@ class UsuarioModel:
                 cursor.close()
     
     # En Model/Personas_M.py (dentro de UsuarioModel)
-# En Model/Personas_M.py (dentro de la clase UsuarioModel)
+        # En Model/Personas_M.py (dentro de la clase UsuarioModel)
 
-def obtener_usuario(self, nombre_usuario: str):
-    """
-    Busca un usuario en la BD por su nombre de usuario.
-    Necesario para el proceso de validación (login).
-    """
-    cursor = self.conexion.obtener_cursor()
-    try:
-        consulta = """
-            SELECT 
-                id, nombre_usuario, clave, nombre, apellido, 
-                fecha_nacimiento, telefono, email, tipo 
-            FROM 
-                LVMS_usuarios 
-            WHERE 
-                nombre_usuario = :1
+    def obtener_usuario(self, nombre_usuario: str):
         """
-        cursor.execute(consulta, (nombre_usuario,))
-        dato = cursor.fetchone() 
-        
-        return dato
-        
-    except Exception as e:
-        print(f"[ERROR_MODELO]: Error en obtener_usuario → {e}")
-        return None
-        
-    finally:
-        if cursor:
-            cursor.close()
+        Busca un usuario en la BD por su nombre de usuario.
+        Necesario para el proceso de validación (login).
+        """
+        cursor = self.conexion.obtener_cursor()
+        try:
+            consulta = """
+                SELECT 
+                    id, nombre_usuario, clave, nombre, apellido, 
+                    fecha_nacimiento, telefono, email, tipo 
+                FROM 
+                    LVMS_usuarios 
+                WHERE 
+                    nombre_usuario = :1
+            """
+            cursor.execute(consulta, (nombre_usuario,))
+            dato = cursor.fetchone() 
+            
+            return dato
+            
+        except Exception as e:
+            print(f"[ERROR_MODELO]: Error en obtener_usuario → {e}")
+            return None
+            
+        finally:
+            if cursor:
+                cursor.close()
         
 
 
@@ -152,32 +152,31 @@ class PacienteModel(UsuarioModel):
         self.comuna = comuna
         self.fecha_primera_visita = fecha_primera_visita
         self.conexion = conexion
-    
-    def Crear_paciente(self, id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, comuna, fecha_primera_visita) -> bool:
 
+    def Crear_paciente(self, id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, comuna, fecha_primera_visita) -> bool:
+        usuario_creado = self.Crear_usuario(id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo)
+        
+        if not usuario_creado:
+            return False
+            
         cursor = self.conexion.obtener_cursor()
 
         try:
-            Validacion = "select * from LVMS_paciente where id = :1"
-            cursor.execute(Validacion, (id,))
-
-            if len(cursor.fetchall()) > 0:
-                print(f"[####]: El paciente con el id {id} proporcionado ya existe.")
-                return False
+            Insertar = "INSERT INTO LVMS_paciente (id_paciente, comuna, fecha_primera_visita) VALUES (:1, :2, :3)"
+        
+            cursor.execute(Insertar, (id, comuna, fecha_primera_visita)) 
             
-            else: 
-                Insertar = "insert into LVMS_paciente (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, comuna, fecha_primera_visita) values (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11)"
-                cursor.execute(Insertar, (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, comuna, fecha_primera_visita))
-                self.conexion.connection.commit()
-                print(f"[####]: Paciente con id {id} creado correctamente.")
-                return True
+            self.conexion.connection.commit()
+            print(f"[####]: Paciente con id {id} creado correctamente.")
+            return True
+            
         except Exception as e:
-            print(f"[####]: Ocurrió un error al crear el paciente → {e}")
+            print(f"[####]: Ocurrió un error al crear el paciente (Sub-tabla) → {e}")
             return False
         finally:
             if cursor:
                 cursor.close()
-
+    
     def Editar_paciente(self, id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, comuna) -> bool:
 
         cursor = self.conexion.obtener_cursor()
@@ -265,32 +264,33 @@ class MedicoModel(UsuarioModel):
         self.especialidad = especialidad
         self.id_medico = id_medico
         self.horario_ingreso = horario_ingreso
-        self.fecha_ingreso = fecha_ingreso    
-    
+        self.fecha_ingreso = fecha_ingreso  
+
+
     def Crear_medico(self, id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso) -> bool:
-
-        cursor = self.conexion.obtener_cursor()
-        try:
-            Validacion = "select * from LVMS_medico where id = :1"
-            cursor.execute(Validacion, (id,))
-            if len(cursor.fetchall()) > 0:
-                print(f"[####]: El médico con el {id} proporcionado ya existe.")
-                return False
+        
+        usuario_creado = self.Crear_usuario(id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo)
+        
+        if not usuario_creado:
+            # El error ya se imprimió en Crear_usuario (ej: ID duplicado)
+            return False
             
-            else: 
-                Insertar = "insert into LVMS_medico (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso) values (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12)"
-                cursor.execute(Insertar, (id, nombre_usuario, clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo, especialidad, id_medico, horario_ingreso))
-                self.conexion.connection.commit()
-                print(f"[####]: Médico con {id} creado correctamente.")
+        cursor = self.conexion.obtener_cursor()
 
-                return True
+        try:
+            Insertar = "INSERT INTO LVMS_medico (id_medico, especialidad, horario_atencion, fecha_ingreso) VALUES (:1, :2, :3, :4)"
+            cursor.execute(Insertar, (id, especialidad, horario_ingreso, date.today())) 
+            
+            self.conexion.connection.commit()
+            print(f"[####]: Médico con {id} y especialidad {especialidad} creado correctamente.")
+            return True
+            
         except Exception as e:
-            print(f"[####]: Ocurrió un error al crear el médico → {e}")
-
+            print(f"[####]: Ocurrió un error al crear el médico (Sub-tabla) → {e}")
             return False
         finally:
             if cursor:
-                cursor.close()
+                cursor.close()  
     
     def editar_medico(self, id, nombre_usuario, clave, nombre, apellido,telefono, email, tipo, horario_ingreso) -> bool:
 

@@ -30,7 +30,7 @@ class UsuarioController:
         clave_hash = bcrypt.hashpw(clave_bytes, bcrypt.gensalt(12)) 
         clave_hash_str = clave_hash.decode('utf-8')
         
-        return self.Modelo.Crear_usuario(id,nombre_usuario, clave_hash , nombre, apellido, fecha_nacimiento, telefono, email, tipo)
+        return self.Modelo.Crear_usuario(id,nombre_usuario, clave_hash_str , nombre, apellido, fecha_nacimiento, telefono, email, tipo)
     
     def listar_usuario(self) -> list:
         
@@ -42,12 +42,12 @@ class UsuarioController:
         else:
             return []
         
-    def validar(self, nombre_usuario: str, clave: str) -> bool:
+    def validar(self, nombre_usuario: str, clave: str):
 
         usuario = self.Modelo.obtener_usuario(nombre_usuario)
         if not usuario:
             print("[####]: Usuario no encontrado")
-            return False
+            return None
 
         clave_hash = usuario[2]
         clave_bytes = clave.encode("utf-8")
@@ -55,10 +55,15 @@ class UsuarioController:
 
         if bcrypt.checkpw(clave_bytes, clave_hash_bytes):
             print("[####]: Ingreso correcto")
-            return True
+            return {
+            'id': usuario[0],
+            'nombre_usuario': usuario[1],
+            'tipo': usuario[8],
+            'nombre': usuario[3]
+                }
         else:
             print("[####]: Credenciales incorrectas")
-            return False
+            return None
         
 class PacienteController:
 
@@ -67,7 +72,7 @@ class PacienteController:
 
     def registrar_paciente(self,id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: date, telefono: int, email: str, tipo: str, comuna: str, fecha_primera_visita: date):
 
-        if not all(id,nombre_usuario,clave,nombre,apellido,fecha_nacimiento,telefono,email,tipo,comuna,fecha_primera_visita):
+        if not all([id,nombre_usuario,clave,nombre,apellido,fecha_nacimiento,telefono,email,tipo,comuna,fecha_primera_visita]):
             print("[####]: Hace faltan datos en el registro de paciente")
             return False
         
@@ -79,7 +84,7 @@ class PacienteController:
         clave_hash = bcrypt.hashpw(clave_bytes, bcrypt.gensalt(12)) 
         clave_hash_str = clave_hash.decode('utf-8')
         
-        return self.Modelo.Crear_paciente(id,nombre_usuario,clave_hash ,nombre,apellido,fecha_nacimiento,telefono,email,tipo,comuna,fecha_primera_visita)
+        return self.Modelo.Crear_paciente(id,nombre_usuario,clave_hash_str ,nombre,apellido,fecha_nacimiento,telefono,email,tipo,comuna,fecha_primera_visita)
     
     def listar_paciente(self) -> list:
         
@@ -114,9 +119,9 @@ class MedicoController:
     def __init__(self, Modelo: MedicoModel):
         self.Modelo = Modelo
 
-    def registrar_medico(self,id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: date, telefono: int, email: str, tipo: str, especialidad: str, horario_atencion: time, fecha_ingreso:date):
+    def registrar_medico(self, id: int, nombre_usuario: str, clave: str, nombre: str, apellido: str, fecha_nacimiento: date, telefono: int, email: str, tipo: str, especialidad: str, id_medico: int,horario_atencion: time, fecha_ingreso: date):
         
-        if not all(id,nombre_usuario,clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo,especialidad, horario_atencion, fecha_ingreso):
+        if not all([id,nombre_usuario,clave, nombre, apellido, fecha_nacimiento, telefono, email, tipo,especialidad, horario_atencion, fecha_ingreso]):
 
             print("[####]: Hace faltan datos en el registro de medico")
             return False
@@ -129,7 +134,7 @@ class MedicoController:
         clave_hash = bcrypt.hashpw(clave_bytes, bcrypt.gensalt(12)) 
         clave_hash_str = clave_hash.decode('utf-8')
         
-        return self.Modelo.Crear_medico(id,nombre_usuario,clave_hash, nombre, apellido, fecha_nacimiento, telefono, email, tipo,especialidad, horario_atencion, fecha_ingreso)
+        return self.Modelo.Crear_medico(id,nombre_usuario,clave_hash_str, nombre, apellido, fecha_nacimiento, telefono, email, tipo,especialidad, horario_atencion, fecha_ingreso)
     
     def listar_medico(self) -> list:
         
@@ -178,7 +183,7 @@ class AdministradorController:
         clave_hash = bcrypt.hashpw(clave_bytes, bcrypt.gensalt(12)) 
         clave_hash_str = clave_hash.decode('utf-8')
         
-        return self.Modelo.Crear_usuario(id,nombre_usuario, clave_hash , nombre, apellido, fecha_nacimiento, telefono, email, tipo)
+        return self.Modelo.Crear_usuario(id,nombre_usuario, clave_hash_str , nombre, apellido, fecha_nacimiento, telefono, email, tipo)
     
     def listar_administrador(self) -> list:
         

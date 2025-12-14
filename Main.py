@@ -97,7 +97,7 @@
 import bcrypt
 import json 
 import sys
-from datetime import date, datetime
+from datetime import date, datetime,time
 from config.db_config import ConexionOracle, validar_tablas
 from Model.Personas_M import UsuarioModel, PacienteModel, MedicoModel, AdministradorModel
 from Model.Objetos_M import RecetasModel, AgendaModel, InsumoModel, ConsultasModel
@@ -127,8 +127,6 @@ def setup_dependencies(conexion):
     """
     Instancia todos los Modelos, Controladores y Vistas.
     """
-    # Instanciación de Modelos 
-    # Los argumentos iniciales (0, "", etc.) son solo para inicializar el objeto.
     m_usuario = UsuarioModel(id=0, nombre_usuario="", clave="", nombre="", apellido="", fecha_nacimiento=date.today(),telefono=0, email="", tipo="", conexion=conexion)
     m_paciente = PacienteModel(id=0, nombre_usuario="", clave="", nombre="", apellido="", fecha_nacimiento=date.today(),telefono=0, email="", tipo="", conexion=conexion, comuna="", fecha_primera_visita=date.today())
     m_medico = MedicoModel(id=0, nombre_usuario="", clave="", nombre="", apellido="", fecha_nacimiento=date.today(),telefono=0, email="", tipo="", conexion=conexion,especialidad="", id_medico=0, horario_ingreso=datetime.now(),fecha_ingreso=date.today())
@@ -154,15 +152,16 @@ def setup_dependencies(conexion):
         'Insumo': InsumoView, 'Receta': RecetasView, 'Agenda': AgendaView, 'Consulta': ConsultaView
     }
 
-    # Retornar un di
-    # pccionario o tupla con todos los componentes
     return {
         'controllers': {'usuario': c_usuario, 'paciente': c_paciente, 'medico': c_medico, 'admin': c_admin, 'insumo': c_insumo},
         'vistas': vistas
     }
 
-def importar_usuarios_desde_json(usuario_controller):
+def importar_usuarios_desde_json(controllers): 
 
+    usuario_controller = controllers['usuario']
+    medico_controller = controllers['medico']
+    
     print("\n[INFO]: Asegurando existencia de Administrador por defecto...")
     usuario_controller.registrar_usuario(
         id=1,
@@ -175,24 +174,53 @@ def importar_usuarios_desde_json(usuario_controller):
         email="admin@mediplus.cl",
         tipo="Administrador"
     )
+
     try:
         with open("users.json", "r", encoding="utf-8") as f:
-            data = json.load(f)     
+            data = json.load(f)      
         print("[INFO]: Importando usuarios desde users.json...")
 
         for u in data:
             user_id = u["id"] + 100 
-            usuario_controller.registrar_usuario(
-                id=user_id,
-                nombre_usuario=u["username"],
-                clave="temp" + str(user_id), 
-                nombre=u["name"],
-                apellido=u.get("surname", "N/A"),
-                fecha_nacimiento=date(2000, 1, 1), 
-                telefono=u["phone"],
-                email=u["email"],
-                tipo="Paciente" 
-            )
+            rol_asignado = "Paciente"
+            
+            if user_id == 101:
+                rol_asignado = "Medico"
+            elif user_id == 102:
+                rol_asignado = "Medico"
+
+            if rol_asignado == "Medico":
+                especialidad = "Cardiología" if user_id == 101 else "Pediatría"
+                
+                medico_controller.registrar_medico(
+                    id=user_id,
+                    nombre_usuario=u["username"],
+                    clave="temp123", 
+                    nombre=u["name"],
+                    apellido=u.get("surname", "N/A"),
+                    fecha_nacimiento=date(1985, 5, 10), 
+                    telefono=u["phone"],
+                    email=u["email"],
+                    tipo="Medico",
+                    especialidad=especialidad,
+                    id_medico=user_id, 
+                    horario_atencion=time(8, 0),
+                    fecha_ingreso=date.today() 
+                )
+            else: 
+                controllers['paciente'].registrar_paciente(
+                    id=user_id,
+                    nombre_usuario=u["username"],
+                    clave="temp123", 
+                    nombre=u["name"],
+                    apellido=u.get("surname", "N/A"),
+                    fecha_nacimiento=date(2000, 1, 1), 
+                    telefono=u["phone"],
+                    email=u["email"],
+                    tipo="Paciente",
+                    comuna="Santiago", 
+                    fecha_primera_visita=date.today() 
+                )
         print("[INFO]: Importación de usuarios finalizada.")
 
     except FileNotFoundError:
@@ -234,9 +262,6 @@ def menu_principal(controllers, vistas, usuario_autenticado):
         print("3. Ver Historial Médico (Recetas/Consultas)")
         print("4. Editar mi Perfil")
         print("5. Cerrar Sesión")
-    
-    # ... (La lógica de lectura de input y dispatching de funciones iría aquí)
-    # Por ejemplo, si el admin elige 2, llamar a: gestion_insumos(controllers, vistas)
 
 def menu_login(usuario_controller):
     """
@@ -247,7 +272,6 @@ def menu_login(usuario_controller):
         nombre_usuario = input("Ingrese nombre de usuario: ")
         clave = input("Ingrese clave: ")
         
-        # El controlador.validar debe devolver el diccionario del usuario autenticado si es exitoso
         usuario = usuario_controller.validar(nombre_usuario, clave) 
         
         if usuario:
@@ -262,28 +286,21 @@ def menu_login(usuario_controller):
 def main():
     print("BIENVENIDO AL SISTEMA MEDIPLUS")
     
-    # 1. Conexión e Inicialización de BD
     conexion = conectar_bd()
     if not conexion:
         print("[FATAL]: No se pudo establecer conexión con la BD. Saliendo.")
         sys.exit(1)
         
-    # 2. Instanciación de Dependencias (Modelos, Controladores, Vistas)
     dependencias = setup_dependencies(conexion)
     usuario_controller = dependencias['controllers']['usuario']
     
-    # 3. Importación de Usuarios (Solo se hace una vez)
-    # Esto es útil para poblar la BD en el primer inicio.
-    importar_usuarios_desde_json(usuario_controller, dependencias['controllers']['admin'])
+    importar_usuarios_desde_json(dependencias['controllers'])
     
-    # 4. Flujo de Login
     usuario_autenticado = menu_login(usuario_controller)
     
-    # 5. Menú Principal (si el login es exitoso)
     if usuario_autenticado:
         menu_principal(dependencias['controllers'], dependencias['vistas'], usuario_autenticado)
 
-    # 6. Desconexión
     conexion.desconectar()
 
 if __name__ == '__main__':
